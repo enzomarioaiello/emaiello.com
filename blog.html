@@ -1,90 +1,90 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Blog — Enzo Aiello</title>
-    <link rel="icon" href="favicon.ico" />
-    <link rel="stylesheet" href="styles.css" />
-    <script src="js/site.js" defer></script>
-    <script src="js/blog.js" defer></script>
-  </head>
-  <body>
-    <header>
-      <h1>Enzo Aiello</h1>
-      <nav>
-        <a href="index.html">home</a>
-        <a href="about.html">about</a>
-        <a href="faq.html">faq</a>
-        <a href="blog.html">blog</a>
-        <a href="contact.html">contact</a>
-      </nav>
-    </header>
-    <main>
-      <section class="blog">
-        <div class="blog-controls">
-          <button type="button" id="toggle-editor">new post</button>
-        </div>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Blog — Enzo Aiello</title>
+        <link rel="icon" href="favicon.ico" />
+        <link rel="stylesheet" href="styles.css" />
+        <script src="js/site.js" defer></script>
+        <script src="js/blog.js" defer></script>
+    </head>
+    <body>
+        <header>
+            <h1>Enzo Aiello</h1>
+            <nav>
+                <a href="index.html">home</a>
+                <a href="about.html">about</a>
+                <a href="faq.html">faq</a>
+                <a href="blog.html">blog</a>
+                <a href="contact.html">contact</a>
+            </nav>
+        </header>
+        <main>
+            <section class="blog">
+                <div class="blog-controls">
+                    <button type="button" id="toggle-editor">new post</button>
+                </div>
 
-        <div id="blog-list-view" class="blog-layout">
-          <aside class="blog-list">
-            <h2>posts</h2>
-            <ul id="post-list"></ul>
-          </aside>
-          <article id="post-detail">
-            <h2 id="post-title">Select a post</h2>
-            <div class="post-meta hidden" id="post-meta">
-              <div class="post-meta-row">
-                <span>id:</span>
-                <span class="id-badge" id="post-id"></span>
-                <button type="button" id="copy-id">copy id</button>
-              </div>
-              <div id="post-created" class="muted"></div>
-              <div id="post-updated" class="muted"></div>
-            </div>
-            <div class="post-actions hidden" id="detail-actions">
-              <button type="button" id="edit-post">edit</button>
-              <button type="button" id="delete-post">delete</button>
-            </div>
-            <div class="post-content" id="post-content">
-              <p>Select a post from the list to read it here.</p>
-            </div>
-          </article>
-        </div>
+                <div id="blog-list-view" class="blog-layout">
+                    <aside class="blog-list">
+                        <h2>posts</h2>
+                        <ul id="post-list"></ul>
+                    </aside>
+                    <article id="post-detail">
+                        <h2 id="post-title">Select a post</h2>
+                        <div class="post-meta hidden" id="post-meta">
+                            <div class="post-meta-row">
+                                <span>id:</span>
+                                <span class="id-badge" id="post-id"></span>
+                                <button type="button" id="copy-id">copy id</button>
+                            </div>
+                            <div id="post-created" class="muted"></div>
+                            <div id="post-updated" class="muted"></div>
+                        </div>
+                        <div class="post-actions hidden" id="detail-actions">
+                            <button type="button" id="edit-post">edit</button>
+                            <button type="button" id="delete-post">delete</button>
+                        </div>
+                        <div class="post-content" id="post-content">
+                            <p>Select a post from the list to read it here.</p>
+                        </div>
+                    </article>
+                </div>
 
-        <div id="blog-editor-view" class="editor-panel hidden">
-          <h2 id="editor-heading">new post</h2>
-          <form id="post-form">
-            <label>
-              title
-              <input name="title" id="post-title-input" autocomplete="off" required />
-            </label>
-            <label>
-              content
-              <textarea name="content" id="post-content-input" required></textarea>
-            </label>
-            <div class="format-options">
-              <span>interpret content as:</span>
-              <label>
-                <input type="radio" name="format" value="markdown" checked />
-                markdown
-              </label>
-              <label>
-                <input type="radio" name="format" value="html" />
-                html
-              </label>
-            </div>
-            <p class="markdown-hint">
-              markdown supports headings (#), bold (**bold**), italic (*italic*), lists (- item), and code blocks
-              with triple backticks.
-            </p>
-            <div class="editor-actions">
-              <button type="submit" id="save-post">save post</button>
-              <button type="button" id="cancel-edit">cancel</button>
-            </div>
-          </form>
-        </div>
-      </section>
-    </main>
-  </body>
+                <div id="blog-editor-view" class="editor-panel hidden">
+                    <h2 id="editor-heading">new post</h2>
+                    <form id="post-form">
+                        <label>
+                            title
+                            <input name="title" id="post-title-input" autocomplete="off" required />
+                        </label>
+                        <label>
+                            content
+                            <textarea name="content" id="post-content-input" required></textarea>
+                        </label>
+                        <div class="format-options">
+                            <span>interpret content as:</span>
+                            <label>
+                                <input type="radio" name="format" value="markdown" checked />
+                                markdown
+                            </label>
+                            <label>
+                                <input type="radio" name="format" value="html" />
+                                html
+                            </label>
+                        </div>
+                        <p class="markdown-hint">
+                            markdown supports headings (#), bold (**bold**), italic (*italic*), lists (- item), and code blocks
+                            with triple backticks.
+                        </p>
+                        <div class="editor-actions">
+                            <button type="submit" id="save-post">save post</button>
+                            <button type="button" id="cancel-edit">cancel</button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+        </main>
+    </body>
 </html>

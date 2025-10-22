@@ -56,21 +56,21 @@ const widget = new ListWidget();
 
 let bgImage = null;
 try {
-    const req = new Request(BG_IMAGE_URL);
-    bgImage = await req.loadImage();
+        const req = new Request(BG_IMAGE_URL);
+        bgImage = await req.loadImage();
 } catch (e) {
-    console.log("Couldn't load background image");
+        console.log("Couldn't load background image");
 }
 
 if (bgImage) {
-    widget.backgroundImage = bgImage;
+        widget.backgroundImage = bgImage;
 }
 
 const overlay = new LinearGradient();
 overlay.locations = [0, 1];
 overlay.colors = [
-    new Color(BG_COLOR, BG_OVERLAY_OPACITY),
-    new Color(BG_COLOR, BG_OVERLAY_OPACITY)
+        new Color(BG_COLOR, BG_OVERLAY_OPACITY),
+        new Color(BG_COLOR, BG_OVERLAY_OPACITY)
 ];
 widget.backgroundGradient = overlay;
 
@@ -93,20 +93,20 @@ gridStack.layoutVertically();
 gridStack.spacing = CIRCLE_SPACING;
 
 for (let row = 0; row < ROWS; row++) {
-  const rowStack = gridStack.addStack();
-  rowStack.layoutHorizontally();
-  rowStack.addSpacer(DOT_SHIFT_LEFT);
-  
-  for (let col = 0; col < COLUMNS; col++) {
-    const day = row * COLUMNS + col + 1;
-    if (day > DAYS_TOTAL) continue;
-    
-    const circle = rowStack.addText("●");
-    circle.font = Font.systemFont(CIRCLE_SIZE);
-    circle.textColor = day <= DAYS_SINCE_START ? COLOR_FILLED : COLOR_UNFILLED;
-    
-    if (col < COLUMNS - 1) rowStack.addSpacer(CIRCLE_SPACING);
-  }
+    const rowStack = gridStack.addStack();
+    rowStack.layoutHorizontally();
+    rowStack.addSpacer(DOT_SHIFT_LEFT);
+
+    for (let col = 0; col < COLUMNS; col++) {
+        const day = row * COLUMNS + col + 1;
+        if (day > DAYS_TOTAL) continue;
+
+        const circle = rowStack.addText("●");
+        circle.font = Font.systemFont(CIRCLE_SIZE);
+        circle.textColor = day <= DAYS_SINCE_START ? COLOR_FILLED : COLOR_UNFILLED;
+
+        if (col < COLUMNS - 1) rowStack.addSpacer(CIRCLE_SPACING);
+    }
 }
 
 widget.addSpacer(TEXT_SPACING);
@@ -133,8 +133,8 @@ daysLeft.font = MENLO_REGULAR;
 daysLeft.textColor = COLOR_UNFILLED;
 
 if (config.runsInWidget) {
-  Script.setWidget(widget);
+    Script.setWidget(widget);
 } else {
-  widget.presentMedium();
+    widget.presentMedium();
 }
 Script.complete();

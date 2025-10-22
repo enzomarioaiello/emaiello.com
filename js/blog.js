@@ -1,60 +1,44 @@
-const BLOG_STORAGE_KEY = 'enzo-blog-posts';
+const API_BASE_URL = '/api/posts';
 
-const DEFAULT_POSTS = [
-    {
-        id: 'boox',
-        title: 'getting the most out of your boox tablet',
-        format: 'html',
-        content: `<p>I've been using my boox tablet for several years now, and given that the devices run android, have found myself keen on customizing them for optimized functionality. here's how I personally use my devices—</p>
-<p>1. I've found myself searching for a new launcher on the device. one of the beauties of android is its ability to switch out the launcher—the main desktop environment that your device returns to after closing an app. while the default onyx launcher is perfectly usable, i'm not content with its lack of several "enthusiast" features, such as the ability to hide apps, add widgets, customize visual design, etc. having tested many launchers, i've been the happiest with unlauncher and aio launcher. unlauncher has worked well on my smaller devices, such as my nova air—while aio launcher has worked well on my larger boox note x.</p>
-<p>2. adjusting note taking settings. while boox isn't particularly refined in ux, at least they offer users the ability to adjust many parts of the note taking experience. if you're writing on pdfs, i'd advise changing the page turn area so misclicks are reduced. this can be done in neoreader by clicking on the top right &gt; settings &gt; touch settings &gt; mode 6.</p>
-<p>3. switching out the stock pen. i'm a bit of a snob when it comes to writing utensils. i've been pampered with high-end stationery for several years now, and often found myself fed up with the stock onyx pen. the plastic feels cheap, and it lacks an eraser. I generally reach for the tab s6 lite s-pen because it has a nice writing feel, is well built, and has a side eraser button.</p>
-<p>here's a list of apps that I find myself using on my boox devices—</p>
-<ul>
-    <li>einkbro: great browser designed for e-ink</li>
-    <li>pocket: great for saving articles for later reading</li>
-    <li>anki: i enjoy studying japanese and reviewing decks on my boox devices</li>
-    <li>syncthing: useful for automatically syncing files between devices</li>
-    <li>tachiyomi: great manga reading app</li>
-    <li>neoreader: my preferred reading app on boox tablets</li>
-    <li>solid explorer: allows you to add folders as a shortcut on your homescreen</li>
-</ul>`,
-        createdAt: '2023-02-10T10:00:00.000Z',
-        updatedAt: '2023-02-10T10:00:00.000Z'
-    },
-    {
-        id: 'focus-notes',
-        title: 'focus notes',
-        format: 'markdown',
-        content: `# focus notes
-
-some quick ideas that keep me on track:
-
-- keep your workspace uncluttered
-- write down the next thing you'll do before you stop
-- rest before you're exhausted
-
-updated automatically whenever edits happen.`,
-        createdAt: '2024-04-11T09:30:00.000Z',
-        updatedAt: '2024-04-11T09:30:00.000Z'
-    },
-    {
-        id: 'countdown',
-        title: 'countdown habits',
-        format: 'markdown',
-        content: `## a simple countdown habit
-
-I like to start my deep work sessions with a quick countdown:
-
-1. tidy my desk
-2. open the tools I need
-3. set a goal for the next 50 minutes
-
-it sounds basic, but it's a ritual that helps me cue the right mindset. I reference [[focus-notes]] whenever I need a reminder.`,
-        createdAt: '2023-03-02T08:15:00.000Z',
-        updatedAt: '2023-03-02T08:15:00.000Z'
+const requestJson = async (url, options = {}) => {
+    const config = {
+        ...options
+    };
+    config.headers = {
+        ...(options.headers || {})
+    };
+    if (config.body && !config.headers['Content-Type']) {
+        config.headers['Content-Type'] = 'application/json';
     }
-];
+
+    let response;
+    try {
+        response = await fetch(url, config);
+    } catch (error) {
+        throw new Error(`Network error: ${error.message}`);
+    }
+
+    if (!response.ok) {
+        let message = '';
+        try {
+            message = await response.text();
+        } catch (_error) {
+            message = '';
+        }
+        throw new Error(message || `Request failed with status ${response.status}`);
+    }
+
+    if (response.status === 204) {
+        return null;
+    }
+
+    const contentType = response.headers.get('Content-Type') || '';
+    if (contentType.includes('application/json')) {
+        return response.json();
+    }
+
+    return null;
+};
 
 const markdownToHtml = (markdown) => {
     const escapeHtml = (str) =>
@@ -158,35 +142,6 @@ const formatDateTime = (value) => {
     }
 };
 
-const loadPosts = () => {
-    try {
-        const raw = localStorage.getItem(BLOG_STORAGE_KEY);
-        if (!raw) {
-            return DEFAULT_POSTS.map((post) => ({ ...post }));
-        }
-        const parsed = JSON.parse(raw);
-        if (!Array.isArray(parsed)) {
-            return DEFAULT_POSTS.map((post) => ({ ...post }));
-        }
-        return parsed.map((post) => ({
-            ...post,
-            createdAt: post.createdAt || new Date().toISOString(),
-            updatedAt: post.updatedAt || new Date().toISOString(),
-            format: post.format === 'html' ? 'html' : 'markdown'
-        }));
-    } catch (_error) {
-        return DEFAULT_POSTS.map((post) => ({ ...post }));
-    }
-};
-
-const savePosts = (posts) => {
-    try {
-        localStorage.setItem(BLOG_STORAGE_KEY, JSON.stringify(posts));
-    } catch (_error) {
-        // storage might be unavailable, ignore silently
-    }
-};
-
 document.addEventListener('DOMContentLoaded', () => {
     const toggleButton = document.getElementById('toggle-editor');
     const listView = document.getElementById('blog-list-view');
@@ -197,6 +152,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const postList = document.getElementById('post-list');
     const postTitleInput = document.getElementById('post-title-input');
     const postContentInput = document.getElementById('post-content-input');
+    const formatRadios = postForm.elements.namedItem('format');
+    const savePostButton = document.getElementById('save-post');
     const detailTitle = document.getElementById('post-title');
     const detailContent = document.getElementById('post-content');
     const detailMeta = document.getElementById('post-meta');
@@ -208,42 +165,95 @@ document.addEventListener('DOMContentLoaded', () => {
     const editPostButton = document.getElementById('edit-post');
     const deletePostButton = document.getElementById('delete-post');
 
-    let posts = loadPosts();
-    let selectedId = null;
-    let editingId = null;
-
-    const isEditorVisible = () => !editorView.classList.contains('hidden');
-
-    const showEditor = (mode, post = null) => {
-        editorHeading.textContent = mode === 'edit' ? 'edit post' : 'new post';
-        postTitleInput.value = post ? post.title : '';
-        postContentInput.value = post ? post.content : '';
-        const targetFormat = post ? post.format : 'markdown';
-        setFormatValue(targetFormat);
-        editingId = post ? post.id : null;
-        editorView.classList.remove('hidden');
-        listView.classList.add('hidden');
-        toggleButton.textContent = 'back to posts';
-        postTitleInput.focus();
+    const state = {
+        posts: [],
+        selectedId: null,
+        editingId: null,
+        isLoading: true,
+        loadError: null
     };
 
-    const showList = () => {
-        editorView.classList.add('hidden');
-        listView.classList.remove('hidden');
-        toggleButton.textContent = 'new post';
-        editingId = null;
+    const getFormatValue = () => {
+        if (!formatRadios) {
+            return 'markdown';
+        }
+        if (typeof formatRadios.length === 'number') {
+            for (const input of Array.from(formatRadios)) {
+                if (input instanceof HTMLInputElement && input.checked) {
+                    return input.value === 'html' ? 'html' : 'markdown';
+                }
+            }
+        }
+        if (formatRadios instanceof HTMLInputElement) {
+            return formatRadios.value === 'html' ? 'html' : 'markdown';
+        }
+        if (typeof formatRadios.value === 'string') {
+            return formatRadios.value === 'html' ? 'html' : 'markdown';
+        }
+        return 'markdown';
+    };
+
+    const setFormatValue = (value) => {
+        const normalized = value === 'html' ? 'html' : 'markdown';
+        if (!formatRadios) {
+            return;
+        }
+        if (typeof formatRadios.length === 'number') {
+            Array.from(formatRadios).forEach((input) => {
+                if (input instanceof HTMLInputElement && input.type === 'radio') {
+                    input.checked = input.value === normalized;
+                }
+            });
+            return;
+        }
+        if (formatRadios instanceof HTMLInputElement) {
+            formatRadios.value = normalized;
+            return;
+        }
+        if (typeof formatRadios.value === 'string') {
+            formatRadios.value = normalized;
+        }
+    };
+
+    const setSavingState = (isSaving) => {
+        if (savePostButton) {
+            savePostButton.disabled = isSaving;
+        }
+        toggleButton.disabled = isSaving;
+    };
+
+    const ensureSelection = () => {
+        if (state.selectedId && state.posts.some((post) => post.id === state.selectedId)) {
+            return;
+        }
+        state.selectedId = state.posts.length ? state.posts[0].id : null;
     };
 
     const renderPostsList = () => {
         postList.innerHTML = '';
-        if (!posts.length) {
+
+        if (state.isLoading) {
+            const item = document.createElement('li');
+            item.textContent = 'Loading posts...';
+            postList.appendChild(item);
+            return;
+        }
+
+        if (state.loadError) {
+            const item = document.createElement('li');
+            item.textContent = state.loadError;
+            postList.appendChild(item);
+            return;
+        }
+
+        if (!state.posts.length) {
             const empty = document.createElement('li');
             empty.textContent = 'No posts yet. Create one to get started.';
             postList.appendChild(empty);
             return;
         }
 
-        const sorted = [...posts].sort(
+        const sorted = [...state.posts].sort(
             (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
         );
 
@@ -251,7 +261,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const item = document.createElement('li');
             item.innerHTML = `
                 <button type="button" class="post-select${
-                    post.id === selectedId ? ' selected' : ''
+                    post.id === state.selectedId ? ' selected' : ''
                 }" data-action="select" data-id="${post.id}">
                     ${post.title}
                 </button>
@@ -273,7 +283,23 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const renderDetail = () => {
-        if (!selectedId) {
+        if (state.isLoading) {
+            detailTitle.textContent = 'Loading posts';
+            detailContent.innerHTML = '<p>Loading...</p>';
+            detailMeta.classList.add('hidden');
+            detailActions.classList.add('hidden');
+            return;
+        }
+
+        if (state.loadError) {
+            detailTitle.textContent = 'Unable to load posts';
+            detailContent.innerHTML = `<p>${state.loadError}</p>`;
+            detailMeta.classList.add('hidden');
+            detailActions.classList.add('hidden');
+            return;
+        }
+
+        if (!state.selectedId) {
             detailTitle.textContent = 'Select a post';
             detailContent.innerHTML = '<p>Select a post from the list to read it here.</p>';
             detailMeta.classList.add('hidden');
@@ -281,7 +307,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        const post = posts.find((item) => item.id === selectedId);
+        const post = state.posts.find((item) => item.id === state.selectedId);
         if (!post) {
             detailTitle.textContent = 'Post not found';
             detailContent.innerHTML = '<p>The post you selected could not be found.</p>';
@@ -297,14 +323,13 @@ document.addEventListener('DOMContentLoaded', () => {
         detailMeta.classList.remove('hidden');
         detailActions.classList.remove('hidden');
 
-        let html =
-            post.format === 'html' ? post.content : markdownToHtml(post.content || '');
+        let html = post.format === 'html' ? post.content : markdownToHtml(post.content || '');
         html = linkifyReferences(html);
         detailContent.innerHTML = html;
     };
 
     const selectPost = (id, updateHash = true) => {
-        selectedId = id;
+        state.selectedId = id;
         renderPostsList();
         renderDetail();
         if (updateHash && id) {
@@ -316,66 +341,110 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    const ensureSelection = () => {
-        if (selectedId && posts.some((post) => post.id === selectedId)) {
-            return;
+    const applyHashSelection = () => {
+        const match = window.location.hash.match(/^#post-(.+)$/);
+        if (match && state.posts.some((post) => post.id === match[1])) {
+            state.selectedId = match[1];
+        } else {
+            ensureSelection();
         }
-        selectedId = posts.length ? posts[0].id : null;
     };
 
-    const createPost = (title, content, format) => {
-        const timestamp = new Date().toISOString();
-        const id =
-            (window.crypto && typeof window.crypto.randomUUID === 'function'
-                ? window.crypto.randomUUID()
-                : `post-${Date.now()}`);
-        const post = {
-            id,
+    const showEditor = (mode, post = null) => {
+        editorHeading.textContent = mode === 'edit' ? 'edit post' : 'new post';
+        postTitleInput.value = post ? post.title : '';
+        postContentInput.value = post ? post.content : '';
+        setFormatValue(post ? post.format : 'markdown');
+        state.editingId = post ? post.id : null;
+        editorView.classList.remove('hidden');
+        listView.classList.add('hidden');
+        toggleButton.textContent = 'back to posts';
+        postTitleInput.focus();
+    };
+
+    const showList = () => {
+        editorView.classList.add('hidden');
+        listView.classList.remove('hidden');
+        toggleButton.textContent = 'new post';
+        state.editingId = null;
+        postTitleInput.value = '';
+        postContentInput.value = '';
+        setFormatValue('markdown');
+    };
+
+    const fetchPosts = async () => {
+        state.isLoading = true;
+        state.loadError = null;
+        renderPostsList();
+        renderDetail();
+
+        try {
+            const data = await requestJson(API_BASE_URL, {
+                method: 'GET'
+            });
+            state.posts = Array.isArray(data) ? data : [];
+        } catch (error) {
+            console.error('Failed to load posts', error);
+            state.posts = [];
+            state.loadError = 'Unable to load posts.';
+        }
+
+        state.isLoading = false;
+        applyHashSelection();
+        renderPostsList();
+        renderDetail();
+    };
+
+    const createPost = async (title, content, format) => {
+        const payload = {
             title,
             content,
-            format,
-            createdAt: timestamp,
-            updatedAt: timestamp
+            format
         };
-        posts = [...posts, post];
-        savePosts(posts);
-        return post;
+        const created = await requestJson(API_BASE_URL, {
+            method: 'POST',
+            body: JSON.stringify(payload)
+        });
+        if (created) {
+            state.posts = [...state.posts, created];
+        }
+        return created;
     };
 
-    const updatePost = (id, changes) => {
-        const timestamp = new Date().toISOString();
-        posts = posts.map((post) =>
-            post.id === id
-                ? {
-                        ...post,
-                        ...changes,
-                        updatedAt: timestamp
-                    }
-                : post
-        );
-        savePosts(posts);
-        return posts.find((post) => post.id === id) || null;
+    const updatePost = async (id, changes) => {
+        const updated = await requestJson(`${API_BASE_URL}/${encodeURIComponent(id)}`, {
+            method: 'PUT',
+            body: JSON.stringify(changes)
+        });
+        if (updated) {
+            state.posts = state.posts.map((post) => (post.id === id ? updated : post));
+        }
+        return updated;
     };
 
-    const deletePost = (id) => {
-        posts = posts.filter((post) => post.id !== id);
-        savePosts(posts);
+    const removePost = async (id) => {
+        await requestJson(`${API_BASE_URL}/${encodeURIComponent(id)}`, {
+            method: 'DELETE'
+        });
+        state.posts = state.posts.filter((post) => post.id !== id);
         ensureSelection();
         renderPostsList();
         renderDetail();
         try {
-            if (selectedId) {
-                history.replaceState(null, '', `#post-${selectedId}`);
+            if (state.selectedId) {
+                history.replaceState(null, '', `#post-${state.selectedId}`);
             } else {
                 history.replaceState(null, '', window.location.pathname);
             }
         } catch (_error) {
-            // ignore history errors (e.g., file protocol)
+            // ignore history errors
         }
     };
 
     const handleCopy = (id) => {
-        if (!id) return;
+        if (!id) {
+            return;
+        }
         const write = async () => {
             if (navigator.clipboard && navigator.clipboard.writeText) {
                 await navigator.clipboard.writeText(id);
@@ -394,7 +463,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     toggleButton.addEventListener('click', () => {
-        if (isEditorVisible()) {
+        if (!editorView.classList.contains('hidden')) {
             showList();
         } else {
             showEditor('create');
@@ -405,7 +474,7 @@ document.addEventListener('DOMContentLoaded', () => {
         showList();
     });
 
-    postForm.addEventListener('submit', (event) => {
+    postForm.addEventListener('submit', async (event) => {
         event.preventDefault();
         const title = postTitleInput.value.trim();
         const content = postContentInput.value.trim();
@@ -415,136 +484,136 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        if (editingId) {
-            const updated = updatePost(editingId, { title, content, format });
-            if (updated) {
-                selectPost(updated.id);
+        try {
+            setSavingState(true);
+            let post;
+            if (state.editingId) {
+                post = await updatePost(state.editingId, { title, content, format });
+            } else {
+                post = await createPost(title, content, format);
             }
-        } else {
-            const created = createPost(title, content, format);
-            selectPost(created.id);
+            if (post) {
+                showList();
+                selectPost(post.id);
+            }
+        } catch (error) {
+            console.error('Failed to save post', error);
+            window.alert('Could not save the post. Please try again.');
+        } finally {
+            setSavingState(false);
         }
-
-        showList();
     });
 
-    postList.addEventListener('click', (event) => {
+    postList.addEventListener('click', async (event) => {
         const target = event.target;
-        if (!(target instanceof HTMLElement)) return;
+        if (!(target instanceof HTMLElement)) {
+            return;
+        }
         const action = target.dataset.action;
         const id = target.dataset.id;
-        if (!action || !id) return;
+        if (!action || !id) {
+            return;
+        }
 
         if (action === 'select') {
             selectPost(id);
+            return;
         }
 
         if (action === 'copy') {
             handleCopy(id);
+            return;
         }
 
         if (action === 'edit') {
-            const post = posts.find((item) => item.id === id);
+            const post = state.posts.find((item) => item.id === id);
             if (post) {
                 showEditor('edit', post);
             }
+            return;
         }
 
         if (action === 'delete') {
             const confirmation =
                 typeof window === 'undefined' ? true : window.confirm('Delete this post?');
-            if (confirmation) {
-                deletePost(id);
+            if (!confirmation) {
+                return;
+            }
+            try {
+                if (deletePostButton) {
+                    deletePostButton.disabled = true;
+                }
+                await removePost(id);
+            } catch (error) {
+                console.error('Failed to delete post', error);
+                window.alert('Could not delete the post. Please try again.');
+            } finally {
+                if (deletePostButton) {
+                    deletePostButton.disabled = false;
+                }
             }
         }
     });
 
     detailContent.addEventListener('click', (event) => {
         const target = event.target;
-        if (!(target instanceof HTMLElement)) return;
+        if (!(target instanceof HTMLElement)) {
+            return;
+        }
         const id = target.dataset.postReference;
-        if (!id) return;
+        if (!id) {
+            return;
+        }
         event.preventDefault();
-        if (posts.some((post) => post.id === id)) {
+        if (state.posts.some((post) => post.id === id)) {
             selectPost(id);
         }
     });
 
     copyIdButton.addEventListener('click', () => {
-        if (selectedId) {
-            handleCopy(selectedId);
+        if (state.selectedId) {
+            handleCopy(state.selectedId);
         }
     });
 
     editPostButton.addEventListener('click', () => {
-        if (!selectedId) return;
-        const post = posts.find((item) => item.id === selectedId);
+        if (!state.selectedId) {
+            return;
+        }
+        const post = state.posts.find((item) => item.id === state.selectedId);
         if (post) {
             showEditor('edit', post);
         }
     });
 
-    deletePostButton.addEventListener('click', () => {
-        if (!selectedId) return;
-        const post = posts.find((item) => item.id === selectedId);
-        if (!post) return;
+    deletePostButton.addEventListener('click', async () => {
+        if (!state.selectedId) {
+            return;
+        }
         const confirmation =
             typeof window === 'undefined' ? true : window.confirm('Delete this post?');
-        if (confirmation) {
-            deletePost(post.id);
+        if (!confirmation) {
+            return;
+        }
+        try {
+            deletePostButton.disabled = true;
+            await removePost(state.selectedId);
+        } catch (error) {
+            console.error('Failed to delete post', error);
+            window.alert('Could not delete the post. Please try again.');
+        } finally {
+            deletePostButton.disabled = false;
         }
     });
 
     window.addEventListener('hashchange', () => {
         const match = window.location.hash.match(/^#post-(.+)$/);
-        if (match && posts.some((post) => post.id === match[1])) {
+        if (match && state.posts.some((post) => post.id === match[1])) {
             selectPost(match[1], false);
         }
     });
 
-    ensureSelection();
-
-    const initialHash = window.location.hash.match(/^#post-(.+)$/);
-    if (initialHash && posts.some((post) => post.id === initialHash[1])) {
-        selectedId = initialHash[1];
-    }
-
     renderPostsList();
     renderDetail();
+    fetchPosts();
 });
-    const getFormatValue = () => {
-        const field = postForm.elements.namedItem('format');
-        if (!field) return 'markdown';
-        if (typeof field.value === 'string') {
-            return field.value === 'html' ? 'html' : 'markdown';
-        }
-        if (typeof field.length === 'number') {
-            for (const input of Array.from(field)) {
-                if (input instanceof HTMLInputElement && input.checked) {
-                    return input.value === 'html' ? 'html' : 'markdown';
-                }
-            }
-        }
-        if (field instanceof HTMLInputElement) {
-            return field.value === 'html' ? 'html' : 'markdown';
-        }
-        return 'markdown';
-    };
-
-    const setFormatValue = (value) => {
-        const normalized = value === 'html' ? 'html' : 'markdown';
-        const field = postForm.elements.namedItem('format');
-        if (!field) return;
-        if (typeof field.value === 'string') {
-            field.value = normalized;
-        }
-        if (typeof field.length === 'number') {
-            Array.from(field).forEach((input) => {
-                if (input instanceof HTMLInputElement && input.type === 'radio') {
-                    input.checked = input.value === normalized;
-                }
-            });
-        } else if (field instanceof HTMLInputElement) {
-            field.value = normalized;
-        }
-    };

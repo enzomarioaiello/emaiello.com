@@ -54,3 +54,7 @@ storybook-static/
 *.cache/
 .cache/
 
+# Custom
+posts/*.json
+posts/*.gitkeep
+

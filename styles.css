@@ -111,20 +111,26 @@ form {
 }
 
 /* Blog */
-.blog-controls {
-    display: flex;
-    justify-content: flex-start;
-    margin-bottom: 2rem;
+body.blog-page main {
+    max-width: 1032px;
 }
 
-.blog-layout {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 2rem;
+.blog {
+    display: grid;
+    grid-template-columns: minmax(220px, 240px) minmax(0, 1fr);
+    column-gap: 2rem;
+    align-items: flex-start;
+    margin-left: 0;
+}
+
+@media (min-width: 1032px) {
+    .blog {
+        margin-left: -136px;
+    }
 }
 
 .blog-list {
-    flex: 1 1 240px;
+    align-self: stretch;
 }
 
 .blog-list ul {
@@ -183,12 +189,40 @@ form {
     flex-wrap: wrap;
 }
 
-article {
-    flex: 2 1 320px;
+.blog-controls {
+    display: flex;
+    justify-content: flex-start;
+    margin-bottom: 2rem;
+}
+
+.blog-main {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    min-width: 0;
+}
+
+.blog-main article,
+.blog-main .editor-panel {
+    min-width: 0;
+    width: 100%;
+}
+
+.blog-main article {
+    max-width: 760px;
+}
+
+.blog-main .editor-panel {
+    max-width: 760px;
 }
 
 .post-content p {
     line-height: 1.5;
+}
+
+.post-content {
+    max-width: 100%;
+    overflow-wrap: break-word;
 }
 
 .post-content pre,
@@ -238,14 +272,16 @@ article {
 }
 
 @media (max-width: 720px) {
+    .blog {
+        margin-left: 0;
+        grid-template-columns: minmax(160px, 35%) minmax(0, 1fr);
+        column-gap: 1.5rem;
+    }
+
     main,
     header {
         padding-left: 1rem;
         padding-right: 1rem;
-    }
-
-    .blog-layout {
-        flex-direction: column;
     }
 
     .post-meta-row {

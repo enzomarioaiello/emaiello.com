@@ -144,7 +144,6 @@ const formatDateTime = (value) => {
 
 document.addEventListener('DOMContentLoaded', () => {
     const toggleButton = document.getElementById('toggle-editor');
-    const listView = document.getElementById('blog-list-view');
     const editorView = document.getElementById('blog-editor-view');
     const editorHeading = document.getElementById('editor-heading');
     const postForm = document.getElementById('post-form');
@@ -155,6 +154,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const formatRadios = postForm.elements.namedItem('format');
     const savePostButton = document.getElementById('save-post');
     const detailTitle = document.getElementById('post-title');
+    const detailView = document.getElementById('post-detail');
     const detailContent = document.getElementById('post-content');
     const detailMeta = document.getElementById('post-meta');
     const detailActions = document.getElementById('detail-actions');
@@ -356,15 +356,15 @@ document.addEventListener('DOMContentLoaded', () => {
         postContentInput.value = post ? post.content : '';
         setFormatValue(post ? post.format : 'markdown');
         state.editingId = post ? post.id : null;
+        detailView.classList.add('hidden');
         editorView.classList.remove('hidden');
-        listView.classList.add('hidden');
         toggleButton.textContent = 'back to posts';
         postTitleInput.focus();
     };
 
     const showList = () => {
+        detailView.classList.remove('hidden');
         editorView.classList.add('hidden');
-        listView.classList.remove('hidden');
         toggleButton.textContent = 'new post';
         state.editingId = null;
         postTitleInput.value = '';

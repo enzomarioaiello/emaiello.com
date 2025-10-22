@@ -9,7 +9,7 @@
         <script src="js/site.js" defer></script>
         <script src="js/blog.js" defer></script>
     </head>
-    <body>
+    <body class="blog-page">
         <header>
             <h1>Enzo Aiello</h1>
             <nav>
@@ -22,15 +22,14 @@
         </header>
         <main>
             <section class="blog">
-                <div class="blog-controls">
-                    <button type="button" id="toggle-editor">new post</button>
-                </div>
-
-                <div id="blog-list-view" class="blog-layout">
-                    <aside class="blog-list">
-                        <h2>posts</h2>
-                        <ul id="post-list"></ul>
-                    </aside>
+                <aside class="blog-list">
+                    <h2>posts</h2>
+                    <ul id="post-list"></ul>
+                </aside>
+                <div class="blog-main">
+                    <div class="blog-controls">
+                        <button type="button" id="toggle-editor">new post</button>
+                    </div>
                     <article id="post-detail">
                         <h2 id="post-title">Select a post</h2>
                         <div class="post-meta hidden" id="post-meta">
@@ -50,39 +49,38 @@
                             <p>Select a post from the list to read it here.</p>
                         </div>
                     </article>
-                </div>
-
-                <div id="blog-editor-view" class="editor-panel hidden">
-                    <h2 id="editor-heading">new post</h2>
-                    <form id="post-form">
-                        <label>
-                            title
-                            <input name="title" id="post-title-input" autocomplete="off" required />
-                        </label>
-                        <label>
-                            content
-                            <textarea name="content" id="post-content-input" required></textarea>
-                        </label>
-                        <div class="format-options">
-                            <span>interpret content as:</span>
+                    <div id="blog-editor-view" class="editor-panel hidden">
+                        <h2 id="editor-heading">new post</h2>
+                        <form id="post-form">
                             <label>
-                                <input type="radio" name="format" value="markdown" checked />
-                                markdown
+                                title
+                                <input name="title" id="post-title-input" autocomplete="off" required />
                             </label>
                             <label>
-                                <input type="radio" name="format" value="html" />
-                                html
+                                content
+                                <textarea name="content" id="post-content-input" required></textarea>
                             </label>
-                        </div>
-                        <p class="markdown-hint">
-                            markdown supports headings (#), bold (**bold**), italic (*italic*), lists (- item), and code blocks
-                            with triple backticks.
-                        </p>
-                        <div class="editor-actions">
-                            <button type="submit" id="save-post">save post</button>
-                            <button type="button" id="cancel-edit">cancel</button>
-                        </div>
-                    </form>
+                            <div class="format-options">
+                                <span>interpret content as:</span>
+                                <label>
+                                    <input type="radio" name="format" value="markdown" checked />
+                                    markdown
+                                </label>
+                                <label>
+                                    <input type="radio" name="format" value="html" />
+                                    html
+                                </label>
+                            </div>
+                            <p class="markdown-hint">
+                                markdown supports headings (#), bold (**bold**), italic (*italic*), lists (- item), and code blocks
+                                with triple backticks.
+                            </p>
+                            <div class="editor-actions">
+                                <button type="submit" id="save-post">save post</button>
+                                <button type="button" id="cancel-edit">cancel</button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </section>
         </main>

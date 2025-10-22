@@ -1,1 +1,59 @@
-assets
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Builds
+dist/
+build/
+.svelte-kit/
+.vercel/
+.netlify/
+.tmp/
+temp/
+tmp/
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# Editor/OS clutter
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+*.swp
+*.swo
+
+# Logs
+*.log
+logs/
+*.pid
+
+# Testing
+coverage/
+.vitest
+
+# SvelteKit specific
+.svelte-kit/
+.svelte-kit-output/
+
+# Storybook / tools
+.storybook-out/
+storybook-static/
+
+# Lockfiles if you don’t want multiple
+# yarn.lock
+# pnpm-lock.yaml
+
+# Misc
+*.local
+*.cache/
+.cache/
+
+# Custom
+posts/*.json
+posts/*.gitkeep

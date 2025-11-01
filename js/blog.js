@@ -292,8 +292,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (state.loadError) {
-            detailTitle.textContent = 'Unable to load posts';
-            detailContent.innerHTML = `<p>${state.loadError}</p>`;
+            detailTitle.textContent = 'no post selected';
+            detailContent.innerHTML = ``;
             detailMeta.classList.add('hidden');
             detailActions.classList.add('hidden');
             return;
@@ -386,7 +386,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (error) {
             console.error('Failed to load posts', error);
             state.posts = [];
-            state.loadError = 'Unable to load posts.';
+            // state.loadError = 'Unable to load posts.';
         }
 
         state.isLoading = false;

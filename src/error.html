@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alchemist AI - Oops!</title>
+    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+
+    <script type="text/javascript">
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const date = new Date();
+            const time = date.toLocaleTimeString();
+            const element = document.getElementById('date');
+            element.innerHTML = `System: Error detected • ${time}`;
+        });
+
+        function handleRetry() {
+            window.location.reload();
+        }
+
+        function handleBack() {
+            window.history.back();
+        }
+    </script>
+</head>
+

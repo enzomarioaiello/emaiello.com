@@ -6,7 +6,7 @@
 	let { children } = $props()
 </script>
 
-<div class="px-16 py-8">
+<div class="max-w-[860px] mx-auto px-24 py-8">
     <Toaster />
     {@render children()}
     <ThemeToggle />

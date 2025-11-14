@@ -41,10 +41,12 @@
     * Makes sure links and underlines stay consistent
     */
     a {
-        margin-right: 0.5rem;
+        margin-right: 0.75rem;
         color: inherit;
-        text-decoration: var(--link-underline);
-        text-decoration-color: var(--border-color);
+    }
+
+    a:hover {
+        text-decoration: underline;
     }
 
     h1, h2, h3 {

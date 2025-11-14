@@ -2,7 +2,7 @@
     import { resolve } from '$app/paths';
     import home from '$lib/images/home.jpg';
 
-    const homeImageAlt = "The Artist's Garden At Eragny by Camille Pissarro"
+    const homeImageDesc = "The Artist's Garden At Eragny by Camille Pissarro"
 </script>
 
 <div class="">
@@ -28,7 +28,7 @@
             </p>
             <p class="py-2">
                 <em>
-                    {homeImageAlt}
+                    {homeImageDesc}
                 </em>
             </p>
         </section>

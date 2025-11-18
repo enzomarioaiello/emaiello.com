@@ -20,10 +20,12 @@
 		"@sveltejs/kit": "^2.47.1",
 		"@sveltejs/vite-plugin-svelte": "^6.2.1",
 		"@types/node": "^22",
+		"autoprefixer": "^10.4.22",
 		"eslint": "^9.38.0",
 		"eslint-config-prettier": "^10.1.8",
 		"eslint-plugin-svelte": "^3.12.4",
 		"globals": "^16.4.0",
+		"postcss": "^8.5.6",
 		"prettier": "^3.6.2",
 		"prettier-plugin-svelte": "^3.4.0",
 		"svelte": "^5.41.0",
@@ -33,8 +35,11 @@
 		"vite": "^7.1.10"
 	},
 	"dependencies": {
-		"@tailwindcss/vite": "^4.1.16",
+		"@tailwindcss/vite": "^4.1.17",
 		"svelte-5-french-toast": "^2.0.6",
-		"tailwindcss": "^4.1.16"
+		"tailwindcss": "^4.1.17"
+	},
+	"overrides": {
+		"cookie": "^0.7.0"
 	}
 }

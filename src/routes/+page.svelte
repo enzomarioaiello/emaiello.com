@@ -1,32 +1,20 @@
 <script lang="ts">
-    import { resolve } from '$app/paths';
     import home from '$lib/images/home.jpg';
 
     const homeImageDesc = "The Artist's Garden At Eragny by Camille Pissarro"
 </script>
 
 <div class="">
-    <header>
-        <h1>Enzo Aiello</h1>
-        <nav>
-            <a href={resolve("/")}>home</a>
-            <a href={resolve("/about")}>about</a>
-            <a href={resolve("/faq")}>faq</a>
-            <a href={resolve("/blog")}>blog</a>
-            <a href={resolve("/contact")}>contact</a>
-        </nav>
-    </header>
-
     <main>
-        <section class="my-4 text-center">
+        <section class="text-center">
             <p>
                 <img
                     src={home}
                     alt="Beautiful"
-                    class="rounded-2xl"
+                    class="rounded-xl"
                 />
             </p>
-            <p class="py-2">
+            <p class="py-2 text-xs">
                 <em>
                     {homeImageDesc}
                 </em>

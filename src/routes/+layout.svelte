@@ -7,7 +7,7 @@
 	let { children } = $props()
 </script>
 
-<div class="max-w-[860px] mx-auto px-24 py-8">
+<div class="max-w-[860px] min-w-[360px] mx-auto px-fluid py-4">
     <Toaster />
     <NavBlock />
     {@render children()}

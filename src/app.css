@@ -1,0 +1,61 @@
+@import 'tailwindcss';
+
+@layer base {
+
+    /* html { */
+    /*     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; */
+    /* } */
+
+    :root {
+        color-scheme: light;
+        --page-bg: #ffffff;
+        --page-text: #000000;
+        --muted-text: #444444;
+        --border-color: #000000;
+        --link-underline: underline;
+        --surface-bg: #ffffff;
+    }
+
+    /*
+    * Every Svelte page inherits this theme
+    */
+    body[data-theme='dark'] {
+        color-scheme: dark;
+        --page-bg: #343434;
+        --page-text: #f5f5f5;
+        --muted-text: #bbbbbb;
+        --border-color: #f5f5f5;
+        --surface-bg: #303030;
+    }
+
+    /*
+    * Adds transition to the switching between light and dark
+    */
+    body {
+        background-color: var(--page-bg);
+        color: var(--page-text);
+        transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    /*
+    * Makes sure links and underlines stay consistent
+    */
+    a {
+        margin-right: 0.75rem;
+        color: inherit;
+    }
+
+    a:hover {
+        text-decoration: underline;
+    }
+
+    h1, h2, h3 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+}
+
+@utility px-fluid {
+    padding-inline: clamp(2rem, calc(100vw * 96 / 860), 6rem);
+}
